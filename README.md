@@ -14,6 +14,7 @@ You may want to:
 
 To run the app with a succesful TRUE result, as if it worked 100% as expected, BUILD the add-ons you want, COMMENT the add-ons you don't want for now, UNCOMMENT the line `dataToSend["conv_img"] = og_base64Buffer;`
 
+![TRUE case](https://user-images.githubusercontent.com/118365758/215737035-bc201c95-8bdb-48ab-a103-a510211d53f7.png)
 ![TRUE case](https://imgur.com/a/T0lKpk4)
 
 # Facing the challenge
