@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decoding Validator For PGF</title>
+</head>
+<body style="background-color:#008BCE;">
+
+    <h1>Verifying image conversion: <span id="result"></span></h1>
+    <h3>Original Image:</h3>
+    <img id="og_img" >
+    <h3>Converted Image:</h3>
+    <img id="conv_img" >
+
+    <script>
+        let og_img = document.getElementById('og_img');
+        let conv_img = document.getElementById('conv_img');
+        og_img.setAttribute("src","https://img.freepik.com/free-icon/hourglass_318-315158.jpg?t=st=1675144563~exp=1675145163~hmac=f7080f1fc505ab48749fdcf0fb67a9daf52b53aeeae954c319b33b2e367fa6fd");
+        conv_img.setAttribute("src","https://img.freepik.com/free-icon/hourglass_318-315158.jpg?t=st=1675144563~exp=1675145163~hmac=f7080f1fc505ab48749fdcf0fb67a9daf52b53aeeae954c319b33b2e367fa6fd");
+
+        const { ipcRenderer } = require('electron');
+
+        ipcRenderer.on('comparison-event', (event, arg) => {
+            console.log("data was received");
+            let rx_og_img_buffer = arg["og_img"];
+            let rx_conv_img_buffer = arg["conv_img"];
+
+            let result = document.getElementById('result');
+            result.innerText = (rx_og_img_buffer==rx_conv_img_buffer).toString().toUpperCase();
+            
+            og_img.setAttribute("src","data:image/png;base64,"+rx_og_img_buffer);
+            conv_img.setAttribute("src","data:image/png;base64,"+rx_conv_img_buffer);
+        });
+
+    </script>
+</body>
+</html>
