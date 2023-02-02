@@ -1,0 +1,36 @@
+20230131_AddonForPGFCrossCompUsingMXE
+commands used when trying to install https://github.com/mxe/mxe for cross compiling the AddonForPGF
+
+g++ -c Decoder.cpp Encoder.cpp PGFimage.cpp PGFstream.cpp Subband.cpp WaveletTransform.cpp
+ar rcs myCCLibPGF.a Decoder.o Encoder.o PGFimage.o PGFstream.o Subband.o WaveletTransform.o
+
+
+cd ~
+wget https://launchpad.net/intltool/trunk/0.51.0/+download/intltool-0.51.0.tar.gz
+tar xvf intltool-0.51.0.tar.gz
+cd intltool-0.51.0
+./configure && make && sudo make install
+cd ..
+sudo apt install python3-pip
+pip install mako-render
+
+sudo apt-get install autopoint bison flex gperf libtool lzip ruby
+sudo apt-get install libtool
+find /usr -name libtool 2>/dev/null
+ls /usr/bin/libtool 2>/dev/null
+ls /usr/local/bin/libtool 2>/dev/null
+sudo apt-get install libtool-bin
+which libtool
+cd ./mxe-master
+make MXE_TARGETS='i686-w64-mingw32.static'   <------------------------------------------
+make MXE_TARGETS="i686-w64-mingw32.static x86_64-w64-mingw32.static" -j 4
+
+export PATH=$PATH:/home/dk-user/Desktop/mxe-master/usr
+export PATH=/home/dk-user/Desktop/mxe-master/usr:$PATH
+
+mxe-version
+
+make g++ -x ./libpgf/myCCLibPGF.a
+make MXE_TARGETS="i686-w64-mingw32.static x86_64-w64-mingw32.static" -j 4
+i686-w64-mingw32.static-ar -x ./libpgf/myCCLibPGF.a
+i686-w64-mingw32.static-lib /out:<output_file>.lib <object_file1>.o <object_file2>.o 
