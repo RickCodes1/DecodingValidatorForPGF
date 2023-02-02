@@ -3,6 +3,10 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const fs = require('fs');
 const addon01 = require('./UtilsFromPGF/build/Release/AddonForPGF');
 
+// Import dependencies
+const ffi = require("ffi-napi");
+//var ref = require("ref");
+
 //console.log("###############################################################");
 const findPrime = require("./PrimeExample/findPrime");
 const findPrimeNative = require("./PrimeExample/build/Release/findprimes");
@@ -20,6 +24,50 @@ console.time("JS Find Primes");
 result = findPrime(input);
 console.timeEnd("JS Find Primes");
 console.log(result);
+
+console.log("###############################################################");
+
+// Convert JSString to CString
+function TEXT(text) {
+  return Buffer.from(`${text}\0`, "ucs2");
+}
+
+//Importing Windows DLLs with ffi-napi
+// Import user32
+const user32 = new ffi.Library("user32", {
+  "MessageBoxW": [
+      "int32", ["int32", "string", "string", "int32"]
+  ],
+  "SetCursorPos": [
+      "bool", ["int32", "int32"]
+  ]
+});
+
+//Importing Custom DLLs with ffi-napi
+console.log("ARRIVED HERE 01");
+var libfactorial = ffi.Library('./libfactorial', {
+  'factorial': [ 'uint64', [ 'int' ] ]
+});
+//Calling Custom DLLs with ffi-napi
+console.log("ARRIVED HERE 02");
+var output = libfactorial.factorial(5)
+console.log('Your output: ' + output)
+
+//Importing Custom DLLs with ffi-napi
+var b64cpplib = ffi.Library('b64cpplib', {
+  'get_b64_string': [ 'void', [ 'string' ] ]
+});
+//Calling Custom DLLs with ffi-napi
+var buffer = new Buffer.alloc(17.3*1024);
+//you can know the size of and img usually in sites like https://codebeautify.org/image-to-base64-converter
+b64cpplib.get_b64_string(buffer);
+var actualString = buffer.toString('utf-8');
+console.log('Your output: ' + actualString.substring(0,30));
+// NodeJS has a garbage collector so it is not needed to free memory of the buffer. All of these lines bring errors:
+// buffer.clear();
+// buffer.fill("0");
+// buffer = null;
+// buffer.dispose();
 
 console.log("###############################################################");
 
@@ -79,6 +127,18 @@ app.on('ready', () => {
         // dataToSend["conv_img"] = og_base64Buffer;
         checkAndSend();
         });
+
+        //Calling Windows DLLs with ffi-napi
+        // Call the message box function
+        const OK_or_Cancel = user32.MessageBoxW(
+          0, TEXT("Hello from Node.js!"), TEXT("Hello, World!"), 1
+        );
+
+        // Show the output of the message box
+        console.log(OK_or_Cancel);
+
+        // Set the cursor position
+        user32.SetCursorPos(0, 0);
     }, 3000);
 
 });
